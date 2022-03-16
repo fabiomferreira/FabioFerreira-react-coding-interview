@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, PageHeader, Descriptions, Input, message } from 'antd';
+import { Button, PageHeader, Descriptions, Input, message, Form, Select } from 'antd';
 
 import { withContextInitialized } from '../../components/hoc';
 import CompanyCard from '../../components/molecules/CompanyCard';
@@ -17,10 +17,15 @@ const PersonDetail = () => {
     router.query?.email as string,
     true
   );
+  const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     load();
   }, []);
+
+  const savePersonData = () => {
+    setIsEditing(false);
+  }
 
   if (loading) {
     return <OverlaySpinner title={`Loading ${router.query?.email} information`} />;
@@ -49,7 +54,7 @@ const PersonDetail = () => {
           >
             Visit website
           </Button>,
-          <Button type="default" onClick={() => {}}>
+          <Button type="default" onClick={() => setIsEditing(true)}>
             Edit
           </Button>,
         ]}
@@ -63,12 +68,38 @@ const PersonDetail = () => {
             <Descriptions.Item label="Birthday">{data.birthday}</Descriptions.Item>
           </Descriptions>
         )}
+        {
+          isEditing && (
+            <Form initialValues={data} onFinish={savePersonData}>
+              <Form.Item label="Name" name="name">
+                <Input />
+              </Form.Item>
+
+              <Form.Item label="Gender" name="gender">
+                <Select />
+              </Form.Item>
+
+              <Form.Item label="Phone" name="phone">
+                <Input type="tel" />
+              </Form.Item>
+
+              <Form.Item label="Birthday" name="birthday">
+                <Input type="date" />
+              </Form.Item>
+
+              <Button type="default" htmlType='submit'>
+                Save  
+              </Button>
+
+            </Form>
+          )
+        }
         <GenericList<Company>
           loading={loading}
           extra={ResponsiveListCard}
           data={data && data.companyHistory}
           ItemRenderer={({ item }: any) => <CompanyCard item={item} />}
-          handleLoadMore={() => {}}
+          handleLoadMore={() => { }}
           hasMore={false}
         />
       </PageHeader>
